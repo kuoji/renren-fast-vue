@@ -20,6 +20,7 @@
 </template>
 
 <script>
+import PubSub from 'pubsub-js'
 
 export default {
   components: {},
@@ -54,7 +55,7 @@ export default {
   methods: {
     getCategorys () {
       this.$http({
-        url: this.$http.adornUrl('/product/category/list/tree'),
+        url: this.$http.adornUrl('/product/category/list'),
         method: 'get'
       }).then(({data}) => {
         this.categorys = data.data

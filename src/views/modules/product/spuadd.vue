@@ -351,6 +351,7 @@
 import CategoryCascader from '../common/category-cascader'
 import BrandSelect from '../common/brand-select'
 import MultiUpload from '../../../components/upload/multiUpload'
+import PubSub from 'pubsub-js'
 
 export default {
   components: {CategoryCascader, BrandSelect, MultiUpload},
@@ -435,7 +436,7 @@ export default {
       // {imgUrl:"",defaultImg:0} 由于concat每次迭代上次，有很多重复。所以我们必须得到上次+这次的总长
 
       this.spu.skus.forEach((item, index) => {
-        let len = imgArr.length - this.spu.skus[index].images.length //还差这么多
+        let len = imgArr.length - this.spu.skus[index].images.length // 还差这么多
         if (len > 0) {
           let imgs = new Array(len)
           imgs = imgs.fill({imgUrl: '', defaultImg: 0})
