@@ -10,7 +10,7 @@
           <el-step title="保存完成"></el-step>
         </el-steps>
       </el-col>
-      <el-col :span="24" v-show="step === 0">
+      <el-col :span="24" v-show="step===0">
         <el-card class="box-card" style="width:80%;margin:20px auto">
           <el-form ref="spuBaseForm" :model="spu" label-width="120px" :rules="spuBaseInfoRules">
             <el-form-item label="商品名称" prop="spuName">
@@ -19,7 +19,7 @@
             <el-form-item label="商品描述" prop="spuDescription">
               <el-input v-model="spu.spuDescription"></el-input>
             </el-form-item>
-            <el-form-item label="选择分类" prop="catelogId">
+            <el-form-item label="选择分类" prop="catalogId">
               <category-cascader></category-cascader>
             </el-form-item>
             <el-form-item label="选择品牌" prop="brandId">
@@ -61,7 +61,7 @@
           </el-form>
         </el-card>
       </el-col>
-      <el-col :span="24" v-show="step === 1">
+      <el-col :span="24" v-show="step===1">
         <el-card class="box-card" style="width:80%;margin:20px auto">
           <el-tabs tab-position="left" style="width:98%">
             <el-tab-pane
@@ -112,7 +112,7 @@
           </div>
         </el-card>
       </el-col>
-      <el-col :span="24" v-show="step === 2">
+      <el-col :span="24" v-show="step===2">
         <el-card class="box-card" style="width:80%;margin:20px auto">
           <el-card class="box-card">
             <div slot="header" class="clearfix">
@@ -162,7 +162,7 @@
           </el-card>
         </el-card>
       </el-col>
-      <el-col :span="24" v-show="step === 3">
+      <el-col :span="24" v-show="step===3">
         <el-card class="box-card" style="width:80%;margin:20px auto">
           <el-table :data="spu.skus" style="width: 100%">
             <el-table-column label="属性组合">
@@ -350,7 +350,7 @@
 <script>
 import CategoryCascader from '../common/category-cascader'
 import BrandSelect from '../common/brand-select'
-import MultiUpload from '../../../components/upload/multiUpload'
+import MultiUpload from '@/components/upload/multiUpload'
 import PubSub from 'pubsub-js'
 
 export default {
@@ -363,19 +363,17 @@ export default {
       uploadDialogVisible: false,
       uploadImages: [],
       step: 0,
-      // spu_name  spu_description  catelog_id  brand_id  weight  publish_status
+      // spu_name  spu_description  catalog_id  brand_id  weight  publish_status
       spu: {
         // 要提交的数据
         spuName: '',
         spuDescription: '',
-        catelogId: 0,
+        catalogId: 0,
         brandId: '',
         weight: '',
         publishStatus: 0,
         decript: [], // 商品详情
-        images: [
-          {imgUrl: ''}
-        ], // 商品图集，最后sku也可以新增
+        images: [], // 商品图集，最后sku也可以新增
         bounds: {
           // 积分
           buyBounds: 0,
@@ -391,7 +389,7 @@ export default {
         spuDescription: [
           {required: true, message: '请编写一个简单描述', trigger: 'blur'}
         ],
-        catelogId: [
+        catalogId: [
           {required: true, message: '请选择一个分类', trigger: 'blur'}
         ],
         brandId: [
@@ -426,6 +424,7 @@ export default {
       inputValue: []
     }
   },
+  // 计算属性 类似于data概念
   computed: {},
   // 监控data中的数据变化
   watch: {
@@ -458,7 +457,7 @@ export default {
       this.spu = {
         spuName: '',
         spuDescription: '',
-        catelogId: 0,
+        catalogId: 0,
         brandId: '',
         weight: '',
         publishStatus: 0,
@@ -646,7 +645,7 @@ export default {
       if (!this.dataResp.steped[1]) {
         this.$http({
           url: this.$http.adornUrl(
-              `/product/attr/sale/list/${this.spu.catelogId}`
+              `/product/attr/sale/list/${this.spu.catalogId}`
           ),
           method: 'get',
           params: this.$http.adornParams({
@@ -672,7 +671,7 @@ export default {
       if (!this.dataResp.steped[0]) {
         this.$http({
           url: this.$http.adornUrl(
-              `/product/attrgroup/${this.spu.catelogId}/withattr`
+              `/product/attrgroup/${this.spu.catalogId}/withattr`
           ),
           method: 'get',
           params: this.$http.adornParams({})
@@ -680,13 +679,15 @@ export default {
           // 先对表单的baseAttrs进行初始化
           data.data.forEach(item => {
             let attrArray = []
-            item.attrs.forEach(attr => {
-              attrArray.push({
-                attrId: attr.attrId,
-                attrValues: '',
-                showDesc: attr.showDesc
+            if (item !== null && item.attrs !== null) {
+              item.attrs.forEach(attr => {
+                attrArray.push({
+                  attrId: attr.attrId,
+                  attrValues: '',
+                  showDesc: attr.showDesc
+                })
               })
-            })
+            }
             this.dataResp.baseAttrs.push(attrArray)
           })
           this.dataResp.steped[0] = 0
@@ -789,7 +790,7 @@ export default {
   // 生命周期 - 挂载完成（可以访问DOM元素）
   mounted () {
     this.catPathSub = PubSub.subscribe('catPath', (msg, val) => {
-      this.spu.catelogId = val[val.length - 1]
+      this.spu.catalogId = val[val.length - 1]
     })
     this.brandIdSub = PubSub.subscribe('brandId', (msg, val) => {
       this.spu.brandId = val
